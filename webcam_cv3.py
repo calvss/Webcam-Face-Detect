@@ -11,6 +11,9 @@ log.basicConfig(filename='webcam.log',level=log.INFO)
 video_capture = cv2.VideoCapture(0)
 anterior = 0
 
+period = 0.01 # loop at 100Hz
+t = time.time()
+
 while True:
     if not video_capture.isOpened():
         print('Unable to load camera.')
@@ -47,6 +50,9 @@ while True:
 
     # Display the resulting frame
     cv2.imshow('Video', frame)
+    
+    #sleep until time passes
+    time.sleep(max(0,t-time.time()))
 
 # When everything is done, release the capture
 video_capture.release()
