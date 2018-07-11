@@ -3,6 +3,8 @@ import sys
 import logging as log
 import datetime as dt
 import time
+from faceObject import faceObject
+from random import randint
 
 cascPath = "haarcascade_frontalface_default.xml"
 faceCascade = cv2.CascadeClassifier(cascPath)
@@ -11,11 +13,29 @@ log.basicConfig(filename='webcam.log',level=log.INFO)
 video_capture = cv2.VideoCapture(0)
 anterior = 0
 
-angle_check = 30 #angle in which to check for rotated faces
-
 period = 0.1 # loop at 10Hz
 t = time.time()
 
+ret, frame = video_capture.read()
+gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+initialFaces = faceCascade.detectMultiScale(gray, scaleFactor=1.1, minNeighbors=5, minSize=(5, 5))
+
+print("Hellooooooo")
+
+faceList = []
+for face in initialFaces:
+    randomColor = [randint(0, 255), randint(0, 255), randint(0, 255)]
+    print([face, randomColor])
+    
+    faceList.append(faceObject(face, randomColor))
+    print("Hello")
+
+for face in faceList:
+    print(face)
+ 
+while True:
+    pass
+    
 while True:
     t+=period
     
@@ -32,20 +52,6 @@ while True:
     gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
     
     faces = faceCascade.detectMultiScale(gray, scaleFactor=1.1, minNeighbors=5, minSize=(5, 5))    #try to detect face
-    
-    if (len(faces) == 0):                                                 #if no faces, try rotating 20 degrees
-        rows,cols = gray.shape
-        M = cv2.getRotationMatrix2D(((cols-1)/2.0,(rows-1)/2.0),angle_check,1)
-        gray = cv2.warpAffine(gray,M,(cols,rows))
-        
-        faces = faceCascade.detectMultiScale(gray, scaleFactor=1.1, minNeighbors=5, minSize=(5, 5))
-        
-    if (len(faces) == 0):                                                 #if still nothing, try rotating the other way
-        rows,cols = gray.shape
-        M = cv2.getRotationMatrix2D(((cols-1)/2.0,(rows-1)/2.0),(360 - 2*angle_check),1)
-        gray = cv2.warpAffine(gray,M,(cols,rows))
-        
-        faces = faceCascade.detectMultiScale(gray, scaleFactor=1.1, minNeighbors=5, minSize=(5, 5))
     
     # Draw a rectangle around the faces
     for (x, y, w, h) in faces:
