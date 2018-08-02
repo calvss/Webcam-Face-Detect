@@ -24,6 +24,8 @@ t = time.time()
 dataset = []
 
 ret, frame = video_capture.read()
+print(len(frame[0]))
+print(len(frame))
 gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
 initialFaces = faceCascade.detectMultiScale(gray, scaleFactor=1.1, minNeighbors=5, minSize=(5, 5))
 
