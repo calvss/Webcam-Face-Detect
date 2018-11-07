@@ -9,7 +9,8 @@ from statistics import mean
 from faceObject import faceObject
 from random import randint
 
-cascPath = "haarcascade_frontalface_default.xml"
+cascPath = "palm.xml"
+#cascPath = "haarcascade_frontalface_default.xml"
 faceCascade = cv2.CascadeClassifier(cascPath)
 log.basicConfig(filename='webcam.log',level=log.INFO)
 
@@ -18,16 +19,18 @@ anterior = 0
 
 maxDistance = 30 # max distance a face moves per frame
 
-period = 0.1 # loop at 10Hz
-t = time.time()
-
+#period = 0.1 # loop at 10Hz
+#t = time.time()
+tstart = time.time()
+frames = 0
 dataset = []
 
 ret, frame = video_capture.read()
+frame = cv2.resize(frame, (0,0), fx=0.5, fy=0.5, interpolation=cv2.INTER_AREA)
 print(len(frame[0]))
 print(len(frame))
 gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-initialFaces = faceCascade.detectMultiScale(gray, scaleFactor=1.1, minNeighbors=5, minSize=(5, 5))
+initialFaces = faceCascade.detectMultiScale(gray, scaleFactor=1.1, minNeighbors=5, minSize=(5, 5), maxSize=(100, 100))
 
 faceList = []
 for boundingBox in initialFaces:
@@ -37,7 +40,8 @@ for boundingBox in initialFaces:
     faceList.append(faceObject(boundingBox, randomColor))
     
 while True:
-    t+=period
+    #t+=period
+    frames += 1
     
     if not video_capture.isOpened():
         print('Unable to load camera.')
@@ -47,7 +51,7 @@ while True:
     # Capture frame-by-frame
     ret, frame = video_capture.read()
     
-    #frame = cv2.resize(frame, (0,0), fx=0.5, fy=0.5, interpolation=cv2.INTER_AREA)
+    frame = cv2.resize(frame, (0,0), fx=0.5, fy=0.5, interpolation=cv2.INTER_AREA)
 
     gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
     
@@ -90,12 +94,14 @@ while True:
     cv2.imshow('Video', frame)
     
     #sleep until time passes
-    time.sleep(max(0,t-time.time()))
+    #time.sleep(max(0,t-time.time()))
 
 dx, dy = zip(*dataset)
 dx = [abs(number) for number in dx]
 dy = [abs(number) for number in dy]
 
+print("fps: ")
+print(frames/(time.time()-tstart))
 print("dx: ")
 print(dx, max(dx))
 print("dy: ")
